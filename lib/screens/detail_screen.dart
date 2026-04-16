@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/article.dart';
 import '../providers/favorites_provider.dart';
@@ -102,9 +103,52 @@ class DetailScreen extends StatelessWidget {
                     ),
                   ),
                   const Divider(height: 28),
+                  Text(
+                    'Đoạn dẫn (RSS)',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   SelectableText(
                     article.body,
                     style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Bài đầy đủ có trên trang VnExpress.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.tonalIcon(
+                    onPressed: () async {
+                      final uri = Uri.parse(article.link);
+                      try {
+                        final ok = await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
+                        if (!context.mounted) return;
+                        if (!ok) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Không mở được liên kết.'),
+                            ),
+                          );
+                        }
+                      } catch (_) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Không mở được liên kết.'),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.open_in_new),
+                    label: const Text('Đọc bài đầy đủ trên VnExpress'),
                   ),
                 ],
               ),
